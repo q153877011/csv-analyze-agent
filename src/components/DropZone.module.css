@@ -13,7 +13,7 @@
     border-color 280ms var(--ease-smooth),
     transform 260ms var(--ease-overshoot),
     background 280ms var(--ease-smooth);
-  /* marching ants 用 dashed + animation 走线 */
+  /* marching ants via dashed border + animation */
   border: 1px dashed rgba(165, 165, 174, 0.35);
   background-image: none;
   overflow: hidden;

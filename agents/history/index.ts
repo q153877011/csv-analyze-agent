@@ -1,8 +1,8 @@
 /**
- * POST /history — 读取分析历史记录
+ * POST /history — Fetch analysis history
  *
- * 从 context.store 中读取当前 conversation 的分析记录，
- * 按 taskId 去重保留最新状态，并标注是否可恢复。
+ * Reads the current conversation's analysis records from context.store,
+ * deduplicates by taskId keeping the latest state, and marks each as restorable.
  */
 import { getSession } from "../_lib/session.js";
 import { jsonResponse } from "../_lib/handlers.js";
@@ -50,7 +50,7 @@ export async function onRequest(context: any) {
     return jsonResponse({ conversation_id: conversationId, records: [] });
   }
 
-  // 按 taskId 去重，保留 updatedAt 最大的一条
+  // Deduplicate by taskId, keeping the entry with the highest updatedAt
   const latest = new Map<string, CsvAnalysisHistoryRecord>();
 
   for (const item of messages) {
@@ -68,12 +68,12 @@ export async function onRequest(context: any) {
     }
   }
 
-  // 按 updatedAt 降序排列，并标注 restorable
+  // Sort by updatedAt descending and annotate restorable
   const records: HistoryRecordWithRestore[] = [...latest.values()]
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .map((record) => ({
       ...record,
-      // done/deleted 状态可从 store 加载制品；running/uploaded 需要 live session
+      // done/deleted: artifacts can be loaded from store; running/uploaded: requires a live session
       restorable:
         record.status === "done" ||
         record.status === "deleted" ||

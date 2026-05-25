@@ -1,9 +1,9 @@
 /**
- * History 持久化：通过 EdgeOne context.store 写入分析摘要 + 完整制品。
+ * History persistence: Write analysis summaries + full artifacts via EdgeOne context.store.
  *
- * 两类记录：
- *   1. analysis_record（轻量快照）：每次状态变更写一条，/history 用
- *   2. analysis_artifacts（完整制品）：分析完成时写一条，/history/detail 用
+ * Two types of records:
+ *   1. analysis_record (lightweight snapshot): written on each status change, used by /history
+ *   2. analysis_artifacts (full artifacts): written on analysis completion, used by /history/detail
  */
 import type { Session } from "./session.js";
 import type { CsvProfile, ChartMeta, Insight } from "./types.js";
@@ -88,8 +88,8 @@ function buildRecord(
 // ─── Public API ─────────────────────────────────────────────
 
 /**
- * 安全地向 context.store 追加一条分析历史记录。
- * 任何 store 写入失败都不影响主分析流程。
+ * Safely append an analysis history record to context.store.
+ * Any store write failure does not affect the main analysis flow.
  */
 export async function appendAnalysisHistory(
   context: any,
@@ -121,7 +121,7 @@ export async function appendAnalysisHistory(
       },
     });
   } catch (err) {
-    // 写入失败不影响主流程，仅打印日志
+    // Write failure does not affect the main flow, only log
     console.warn(
       "[history] appendAnalysisHistory failed:",
       err instanceof Error ? err.message : String(err),
@@ -200,8 +200,8 @@ export interface AnalysisArtifacts {
 }
 
 /**
- * 分析完成后，把完整制品（SVG、insights、报告）持久化到 context.store。
- * 失败不影响主流程。
+ * After analysis completes, persist full artifacts (SVG, insights, report) to context.store.
+ * Failure does not affect the main flow.
  */
 export async function persistAnalysisArtifacts(
   context: any,

@@ -1,5 +1,5 @@
 /**
- * 组装层：从 TaskContext 拼出 markdown + HTML 报告。
+ * Assembly layer: Build markdown + HTML reports from TaskContext.
  */
 import { writeFile, readFile } from "node:fs/promises";
 import path from "node:path";
@@ -50,8 +50,8 @@ export async function assembleReports(
 
 function buildChartsMd(ctx: TaskContext): string {
   const lines: string[] = [];
-  lines.push(`# 数据可视化报表`);
-  lines.push(`> 自动生成 · 共 ${ctx.charts.length} 张图 · 来源：\`${basename(ctx.csvPath)}\``);
+  lines.push(`# Data Visualization Report`);
+  lines.push(`> Auto-generated · ${ctx.charts.length} charts · Source: \`${basename(ctx.csvPath)}\``);
   lines.push("");
   ctx.charts.forEach((c, i) => {
     lines.push(`## ${i + 1}. ${c.title}`);
@@ -71,13 +71,13 @@ function buildInsightMd(ctx: TaskContext): string {
   const summary = ctx.insights.find((x) => x.kind === "summary");
 
   const lines: string[] = [];
-  lines.push(`# 数据洞察报告`);
-  lines.push(`> 来源：\`${basename(ctx.csvPath)}\` · 共 ${ctx.charts.length} 张图，${perChart.length} 条分图洞察`);
+  lines.push(`# Data Insights Report`);
+  lines.push(`> Source: \`${basename(ctx.csvPath)}\` · ${ctx.charts.length} charts, ${perChart.length} per-chart insights`);
   lines.push("");
-  lines.push(`## 总体结论`);
-  lines.push(summary?.text ?? "（洞察 agent 未生成总结）");
+  lines.push(`## Overall Conclusion`);
+  lines.push(summary?.text ?? "(Insight agent did not generate a summary)");
   lines.push("");
-  lines.push(`## 分图洞察`);
+  lines.push(`## Per-Chart Insights`);
   lines.push("");
   for (const c of ctx.charts) {
     const insights = perChart.filter((x) => x.chartId === c.id);
@@ -97,11 +97,11 @@ function buildCombinedMd(ctx: TaskContext): string {
   const summary = ctx.insights.find((x) => x.kind === "summary");
 
   const lines: string[] = [];
-  lines.push(`# 数据分析报告`);
-  lines.push(`> 来源：\`${basename(ctx.csvPath)}\``);
+  lines.push(`# Data Analysis Report`);
+  lines.push(`> Source: \`${basename(ctx.csvPath)}\``);
   lines.push("");
-  lines.push(`## 总体结论`);
-  lines.push(summary?.text ?? "（洞察 agent 未生成总结）");
+  lines.push(`## Overall Conclusion`);
+  lines.push(summary?.text ?? "(Insight agent did not generate a summary)");
   lines.push("");
   ctx.charts.forEach((c, i) => {
     lines.push(`## ${i + 1}. ${c.title}`);
@@ -126,12 +126,12 @@ async function toInlineHtml(ctx: TaskContext): Promise<string> {
   const summary = ctx.insights.find((x) => x.kind === "summary");
 
   const sections: string[] = [];
-  sections.push(`<h1>数据分析报告</h1>`);
+  sections.push(`<h1>Data Analysis Report</h1>`);
   sections.push(
-    `<p class="meta">来源：<code>${escapeHtml(basename(ctx.csvPath))}</code></p>`,
+    `<p class="meta">Source: <code>${escapeHtml(basename(ctx.csvPath))}</code></p>`,
   );
-  sections.push(`<h2>总体结论</h2>`);
-  sections.push(`<p>${escapeHtml(summary?.text ?? "（洞察 agent 未生成总结）")}</p>`);
+  sections.push(`<h2>Overall Conclusion</h2>`);
+  sections.push(`<p>${escapeHtml(summary?.text ?? "(Insight agent did not generate a summary)")}</p>`);
 
   for (let i = 0; i < ctx.charts.length; i++) {
     const c = ctx.charts[i]!;
@@ -155,10 +155,10 @@ async function toInlineHtml(ctx: TaskContext): Promise<string> {
   }
 
   return `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>${escapeHtml(basename(ctx.csvPath))} — 数据分析报告</title>
+<title>${escapeHtml(basename(ctx.csvPath))} — Data Analysis Report</title>
 <style>
   :root {
     --bg: #ffffff;

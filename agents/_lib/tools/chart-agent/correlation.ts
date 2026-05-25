@@ -1,5 +1,5 @@
 /**
- * compute_correlation：两列数值的 Pearson 相关系数 + 近似 p-value。
+ * compute_correlation: Pearson correlation coefficient + approximate p-value for two numeric columns.
  */
 import { tool } from "@anthropic-ai/claude-agent-sdk";
 import { z } from "zod";

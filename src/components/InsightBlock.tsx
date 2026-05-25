@@ -1,13 +1,14 @@
 /**
- * InsightBlock：展示某条洞察。
- * 后端一次性推一整段 text，前端做"伪流式打字机"（每 12ms 一个字）——视觉上比直接淡入更有仪式感。
+ * InsightBlock: displays a single insight entry.
+ * The backend pushes a full block of text at once; the frontend simulates a typewriter effect
+ * (one character every 12ms) — more ceremonial than a plain fade-in.
  */
 import { useEffect, useState } from "react";
 import styles from "./InsightBlock.module.css";
 
-export interface InsightBlockProps {
+interface InsightBlockProps {
   text: string;
-  /** 是否在写——尚在最新一条时 true，旧的为 false（不做打字机） */
+  /** Whether currently being written — true for the latest entry, false for older ones (no typewriter effect) */
   live?: boolean;
 }
 
@@ -53,12 +54,12 @@ export function InsightBlock({ text, live }: InsightBlockProps) {
 }
 
 /**
- * 粗暴高亮常见数字：百分数、货币、比率、倍数、相关系数。
+ * Naively highlights common numbers: percentages, currencies, ratios, multiples, correlation coefficients.
  *
- * 但要跳过 ISO 日期（2024-01-05）、时间（14:30:00）、版本号（1.2.3）——
- * 否则会被拆成一堆零散的 <mark>2024</mark>-<mark>01</mark>-<mark>05</mark>，观感很差。
+ * Skips ISO dates (2024-01-05), times (14:30:00), and version numbers (1.2.3) —
+ * otherwise they'd be broken into scattered <mark>2024</mark>-<mark>01</mark>-<mark>05</mark>, which looks bad.
  *
- * 做法：先用占位符把这些"复合数字结构"保护起来，做完高亮再放回。
+ * Approach: first protect these "compound numeric structures" with placeholders, apply highlighting, then restore.
  */
 function highlightNumbers(s: string): string {
   const escaped = s
@@ -74,18 +75,18 @@ function highlightNumbers(s: string): string {
       return token;
     });
 
-  // 按"先长后短"顺序 protect：datetime > date > time > 版本号
+  // Protect in "longest first" order: datetime > date > time > version
   let working = escaped;
-  // ISO 日期 + 可选时间：2024-01-05T14:30:00 / 2024/1/5 14:30
+  // ISO date + optional time: 2024-01-05T14:30:00 / 2024/1/5 14:30
   working = protect(
     /\b\d{4}[-/.]\d{1,2}[-/.]\d{1,2}(?:[T ]\d{1,2}:\d{2}(?::\d{2})?)?/g,
     working,
   );
-  // 中文日期：2024年1月5日
+  // Chinese date format: e.g. Jan 5, 2024
   working = protect(/\d{4}年\d{1,2}月\d{1,2}日/g, working);
-  // 纯时间：14:30(:00)
+  // Time only: 14:30(:00)
   working = protect(/\b\d{1,2}:\d{2}(?::\d{2})?\b/g, working);
-  // 版本号：1.2.3
+  // Version number: 1.2.3
   working = protect(/\b\d+\.\d+\.\d+\b/g, working);
 
   const highlighted = working.replace(
@@ -93,7 +94,7 @@ function highlightNumbers(s: string): string {
     (m) => `<mark>${m}</mark>`,
   );
 
-  // 放回占位
+  // Restore placeholders
   return highlighted.replace(/\u0000P(\d+)\u0000/g, (_, idx) => {
     const raw = placeholders[Number(idx)] ?? "";
     return raw;

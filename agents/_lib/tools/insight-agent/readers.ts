@@ -1,5 +1,5 @@
 /**
- * Insight Agent 只读工具集：从 Chart Agent 阶段的缓存中读取数据。
+ * Insight Agent read-only tool set: reads data from the Chart Agent phase cache.
  */
 import { tool } from "@anthropic-ai/claude-agent-sdk";
 import { z } from "zod";

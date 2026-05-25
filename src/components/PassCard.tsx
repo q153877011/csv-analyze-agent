@@ -1,12 +1,12 @@
 /**
- * PassCard：上传完成后，drop zone 折叠为一张"电影票根"卡片。
- * 左侧有 vertical 撕齿边（用 radial-gradient 画），左边框 emerald 2px。
+ * PassCard: after upload completes, the drop zone collapses into a "movie ticket stub" card.
+ * Left side has a vertical perforated edge (drawn with radial-gradient), with a 2px emerald left border.
  */
 import styles from "./PassCard.module.css";
 import type { UploadResponse } from "../types";
 import { formatSize } from "../lib/format";
 
-export interface PassCardProps {
+interface PassCardProps {
   upload: UploadResponse;
   status?: string;
   active?: boolean;

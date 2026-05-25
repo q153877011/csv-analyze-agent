@@ -1,14 +1,14 @@
 /**
- * DropZone：ACT 1 左侧的 CSV 拖拽上传区。
+ * DropZone: CSV drag-and-drop upload area on the left side of ACT 1.
  *
- * - marching ants 虚线动画
- * - 文件类型错误 → 1.8s 红色错误提示
- * - 上传中 → emerald 脉冲环
+ * - marching ants dashed border animation
+ * - file type error → 1.8s red error message
+ * - uploading → emerald pulse ring
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./DropZone.module.css";
 
-export interface DropZoneProps {
+interface DropZoneProps {
   onFile: (file: File) => Promise<void>;
   disabled?: boolean;
 }

@@ -1,15 +1,15 @@
 /**
- * App.tsx —— 整体状态机。
+ * App.tsx — Overall state machine.
  *
- * 布局：
- *   左侧 44vw：DropZone（idle）→ PassCard（running）
- *   右侧 56vw：AgentCanvas
- *   底部浮动状态栏
- *   右侧抽屉（按需）
+ * Layout:
+ *   Left 44vw: DropZone (idle) → PassCard (running)
+ *   Right 56vw: AgentCanvas
+ *   Bottom floating status bar
+ *   Right drawer (on demand)
  *
- * 关键行为：
- *   - upload 成功 → setUpload → connect SSE → POST /start
- *   - insight agent 运行时 → body 加 insight-active class（切 accent 到 amber）
+ * Key behaviors:
+ *   - upload success → setUpload → connect SSE → POST /start
+ *   - insight agent running → body gets insight-active class (switches accent to amber)
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { UploadResponse } from "./types";
@@ -51,7 +51,7 @@ function getOrCreateConversationId(): string {
 
 // ─── URL helpers ────────────────────────────────────────────
 
-/** 把 taskId 放进 URL（?task=xxx），刷新后能读到 */
+/** Put taskId in URL (?task=xxx) so it can be read after refresh */
 function setTaskIdInUrl(taskId: string | null) {
   const url = new URL(window.location.href);
   if (taskId) url.searchParams.set("task", taskId);
@@ -78,7 +78,7 @@ function setReportIdInUrl(taskId: string | null) {
   window.history.replaceState({}, "", url.toString());
 }
 
-// ✅ 模块级去重标记 —— 脱离 React 生命周期，StrictMode 无法干扰
+// ✅ Module-level dedup flag — outside React lifecycle, StrictMode cannot interfere
 let _historyFetchInFlight = false;
 
 // ─── App ────────────────────────────────────────────────────
@@ -90,9 +90,9 @@ export default function App() {
     () => !!getTaskIdFromUrl(),
   );
   const bootstrappedRef = useRef(false);
-  /** 用户在 DropZone 下方勾选的 analyze 选项（持久到本次 session） */
+  /** Analyze options checked by user below DropZone (persisted for current session) */
   const [chartsOnly, setChartsOnly] = useState<boolean>(false);
-  /** 上次分析用的选项——retry 时复用 */
+  /** Options used in last analysis — reused on retry */
   const lastOptsRef = useRef<{ chartsOnly: boolean; demoMode?: boolean } | null>(null);
   const [rerunning, setRerunning] = useState<boolean>(false);
 
@@ -136,7 +136,7 @@ export default function App() {
       });
   }, []);
 
-  // 启动时：若 URL 里带了 task=xxx，尝试从后端拉快照恢复
+  // On startup: if URL has task=xxx, try fetching snapshot from backend to restore
   useEffect(() => {
     if (bootstrappedRef.current) return;
     bootstrappedRef.current = true;
@@ -151,12 +151,12 @@ export default function App() {
       try {
         const snap = await fetchSession(tid, conversationIdRef.current);
         if (!snap) {
-          // session 已过期或服务器重启，清理 URL
+          // Session expired or server restarted, clean up URL
           setTaskIdInUrl(null);
           return;
         }
         restore(snap);
-        // 如果 session 还在跑 / 待跑，继续订阅 SSE
+        // If session is still running / pending, continue subscribing to SSE
         if (snap.status === "running" || snap.status === "uploaded") {
           connect(snap.taskId);
         }
@@ -169,7 +169,7 @@ export default function App() {
     })();
   }, [restore, connect]);
 
-  // upload 成功后把 taskId 写进 URL
+  // After upload success, write taskId into URL
   useEffect(() => {
     if (state.upload?.taskId) {
       setTaskIdInUrl(state.upload.taskId);
@@ -197,8 +197,8 @@ export default function App() {
   const handleReset = useCallback(() => {
     setTaskIdInUrl(null);
     reset();
-    // 不删除 session——它会自动过期（24h TTL）。
-    // 这样历史记录能通过 live session fallback 正确加载报告。
+    // Don't delete session — it auto-expires (24h TTL).
+    // This way history can correctly load reports via live session fallback.
     fetchAnalysisHistory(conversationIdRef.current).then(setHistoryRecords);
   }, [reset]);
 
@@ -239,25 +239,25 @@ export default function App() {
     async (record: HistoryRecordWithRestore) => {
       if (!record.restorable) return;
 
-      // done/deleted 状态 → 打开报告视图（从 store 或 live session 加载）
+      // done/deleted status → open report view (loaded from store or live session)
       if (record.status === "done" || record.status === "deleted") {
         setReportTaskId(record.taskId);
         setReportIdInUrl(record.taskId);
         return;
       }
 
-      // running/uploaded → 先尝试从 live session 获取快照
+      // running/uploaded → try getting snapshot from live session first
       const snap = await fetchSession(record.taskId, conversationIdRef.current);
       if (!snap) return;
 
-      // 如果 live session 实际已完成，直接打开报告视图
+      // If live session is actually done, open report view directly
       if (snap.status === "done") {
         setReportTaskId(record.taskId);
         setReportIdInUrl(record.taskId);
         return;
       }
 
-      // 仍在运行中，恢复实时会话
+      // Still running, restore live session
       restore(snap);
       setTaskIdInUrl(record.taskId);
 
@@ -284,7 +284,7 @@ export default function App() {
 
   const passStatus = currentPassStatus(state);
 
-  // 恢复中展示一个极简 loader（保持 OLED 黑底，不闪）
+  // Show minimal loader during restore (keep OLED black bg, no flash)
   if (bootstrapping) {
     return (
       <>
@@ -308,7 +308,7 @@ export default function App() {
     );
   }
 
-  // 报告视图（从历史记录打开）
+  // Report view (opened from history)
   if (reportTaskId) {
     return (
       <ReportView
@@ -335,7 +335,7 @@ export default function App() {
           gap: 0,
         }}
       >
-        {/* 左栏 44vw */}
+        {/* Left column 44vw */}
         <aside
           style={{
             width: "44vw",
@@ -435,7 +435,7 @@ export default function App() {
             />
           )}
 
-          {/* 完成 + 有图 → 提供"重跑 insight"入口 */}
+          {/* Done + has charts → provide "re-run insight" entry */}
           {state.upload &&
             state.done &&
             state.charts.length > 0 && (
@@ -552,7 +552,7 @@ export default function App() {
           )}
         </aside>
 
-        {/* 右栏 56vw */}
+        {/* Right column 56vw */}
         <AgentCanvas phase={state.phase} state={state} onReset={handleReset} />
       </main>
 

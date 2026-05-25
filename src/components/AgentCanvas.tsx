@@ -1,11 +1,11 @@
 /**
- * AgentCanvas：右侧主画面，随 phase 切换内容。
+ * AgentCanvas: main right-hand canvas that switches content based on phase.
  *
- * idle       → 巨型引导
+ * idle       → hero guide
  * scanning   → ColumnScan
- * charting   → ChartCard 堆叠
+ * charting   → ChartCard stack
  * insights   → ChartCard + InsightBlock
- * report     → ReportActions + 所有内容
+ * report     → ReportActions + all content
  */
 import { AnimatePresence, motion } from "framer-motion";
 import type { Phase } from "../hooks/useAgentStream";
@@ -17,7 +17,7 @@ import { SummaryIsland } from "./SummaryIsland";
 import { ReanalyzeButton } from "./ReanalyzeButton";
 import styles from "./AgentCanvas.module.css";
 
-export interface AgentCanvasProps {
+interface AgentCanvasProps {
   phase: Phase;
   state: AgentStreamState;
   onReset: () => void;
@@ -65,10 +65,10 @@ export function AgentCanvas({ phase, state, onReset }: AgentCanvasProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* summary 浮岛：仅报告阶段展示在最顶端 */}
+            {/* Summary island: shown at the very top only during the report phase */}
             {done && summary && <SummaryIsland text={summary.text} />}
 
-            {/* Column Scan —— 在分析过程中一直可见（做为数据概览），完成后隐藏 */}
+            {/* Column Scan —— visible throughout analysis (as data overview), hidden after completion */}
             {!done && upload && (
               <ColumnScan
                 distributions={upload.distributions}
@@ -76,7 +76,7 @@ export function AgentCanvas({ phase, state, onReset }: AgentCanvasProps) {
               />
             )}
 
-            {/* Chart 卡片 + 对应 insights */}
+            {/* Chart cards + corresponding insights */}
             {charts.map((c, i) => {
               const liveIdx = perChart.length - 1;
               const chartInsights = perChart.filter(
@@ -99,7 +99,7 @@ export function AgentCanvas({ phase, state, onReset }: AgentCanvasProps) {
               );
             })}
 
-            {/* 分析完成后在 canvas 底部出现"再来一次"CTA */}
+            {/* "Analyze again" CTA appears at the bottom of the canvas after analysis completes */}
             {done && <ReanalyzeButton onClick={onReset} />}
           </motion.div>
         )}

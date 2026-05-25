@@ -1,6 +1,6 @@
 /**
- * ChartCard：单张图表卡片。
- * 从后端拉 svg，dangerouslySetInnerHTML 内联。
+ * ChartCard: a single chart card.
+ * Fetches SVG from the backend and inlines it with dangerouslySetInnerHTML.
  */
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -8,10 +8,10 @@ import type { ChartMeta } from "../types";
 import { fetchSvg } from "../lib/api";
 import styles from "./ChartCard.module.css";
 
-export interface ChartCardProps {
+interface ChartCardProps {
   chart: ChartMeta;
   index: number;
-  /** 直接传入 SVG 字符串（历史报告模式），跳过网络请求 */
+  /** Directly pass SVG string (history report mode), bypassing the network request */
   svgContent?: string;
   children?: React.ReactNode;
 }

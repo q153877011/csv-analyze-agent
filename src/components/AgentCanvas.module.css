@@ -59,11 +59,11 @@
   display: flex;
   flex-direction: column-reverse;
   gap: 20px;
-  /* column-reverse 使新图从顶部追加（newest on top） */
+  /* column-reverse causes new items to stack from the top (newest on top) */
 }
 
 .stack > *:first-child {
-  /* SummaryIsland 在 DOM 最后，视觉在顶 */
+  /* SummaryIsland is last in the DOM but appears at the top visually */
   order: 2;
 }
 

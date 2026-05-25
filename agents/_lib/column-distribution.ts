@@ -1,5 +1,5 @@
 /**
- * 为前端 ColumnScan 可视化计算每列 60 个归一化值（0..1）。
+ * Compute 60 normalized values (0..1) per column for the frontend ColumnScan visualization.
  */
 import type { CsvProfile, ColumnProfile, SemanticType } from "./types.js";
 

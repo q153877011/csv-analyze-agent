@@ -1,6 +1,6 @@
 /**
- * Session 管理：内存 + 磁盘。
- * EdgeOne Pages Functions 共享同一个进程，所以内存态 session 在同实例内有效。
+ * Session management: in-memory + disk.
+ * EdgeOne Pages Functions share a single process, so in-memory sessions are valid within the same instance.
  */
 import crypto from "node:crypto";
 import path from "node:path";

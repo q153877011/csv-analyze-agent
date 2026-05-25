@@ -1,14 +1,14 @@
 /**
- * useAgentStream：把 SSE 事件流收拢成一份可渲染的 state。
+ * useAgentStream: Consolidates the SSE event stream into renderable state.
  *
- * state 机器大致：
+ * State machine roughly:
  *   idle → scanning (chart agent running)
- *        → charting (已有至少 1 张图)
+ *        → charting (at least 1 chart received)
  *        → insights (insight agent running)
  *        → report (done)
  *
- * 注意：SSE 可能在 charts 还没全部 done 时就开始 insights，
- * 所以我们不完全按"阶段"切换，而是综合 currentAgent / charts / insights 推导 UI。
+ * Note: SSE may start insights before all charts are done,
+ * so we don't switch purely by "phase" but derive UI from currentAgent / charts / insights.
  */
 import { useCallback, useEffect, useReducer, useRef } from "react";
 import type {
@@ -43,9 +43,9 @@ export interface AgentStreamState {
   currentAgent: AgentRole | null;
   agentStatus: Record<AgentRole, AgentState | "idle">;
 
-  /** 工具调用按执行顺序记录 */
+  /** Tool invocations recorded in execution order */
   tools: ToolInvocation[];
-  /** 当前 running 的 tool id（便于 scanline 同步） */
+  /** Currently running tool id (for scanline sync) */
   runningTool: string | null;
 
   charts: ChartMeta[];
@@ -100,7 +100,7 @@ function reducer(s: AgentStreamState, a: Action): AgentStreamState {
         phase: "idle",
       };
     case "restore": {
-      // 从后端快照恢复：先建立 upload state，再把 events 依次 replay
+      // Restore from backend snapshot: first establish upload state, then replay events
       const snap = a.payload;
       const base: AgentStreamState = {
         ...initialState,
@@ -114,12 +114,12 @@ function reducer(s: AgentStreamState, a: Action): AgentStreamState {
         },
         phase: "idle",
       };
-      // 一轮 reduce 把所有历史事件应用一遍
+      // Single-pass reduce to apply all historical events
       let next = base;
       for (const evt of snap.events) {
         next = applyEvent(next, evt);
       }
-      // 如果快照里没有 done 事件，但 status 明确是 done/error，也兜底标记
+      // If snapshot has no done event but status clearly is done/error, mark it as fallback
       if (!next.done && (snap.status === "done" || snap.status === "error")) {
         next = { ...next, done: snap.status === "done" };
       }
@@ -198,7 +198,7 @@ function applyEvent(
       return { ...s, tools, runningTool };
     }
     case "chart": {
-      // 幂等，按 id 合并
+      // Idempotent, merge by id
       const exists = s.charts.some((c) => c.id === evt.chart.id);
       const charts = exists
         ? s.charts.map((c) => (c.id === evt.chart.id ? evt.chart : c))
@@ -207,7 +207,7 @@ function applyEvent(
       return { ...s, charts, phase };
     }
     case "insight": {
-      // summary 去重替换；per_chart 按内容追加
+      // Deduplicate summary by replacing; append per_chart by content
       if (evt.insight.kind === "summary") {
         const withoutOld = s.insights.filter((i) => i.kind !== "summary");
         return { ...s, insights: [...withoutOld, evt.insight] };
@@ -270,7 +270,7 @@ export function useAgentStream(): UseAgentStream {
       taskId,
       (evt) => dispatch({ kind: "event", payload: evt }),
       () => {
-        // EventSource 自身会重连；只在致命错误时才清理
+        // EventSource auto-reconnects; only clean up on fatal errors
       },
     );
   }, []);

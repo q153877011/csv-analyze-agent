@@ -1,5 +1,5 @@
 /**
- * create_chart：渲染 Vega-Lite 为 SVG + 注册图表元数据，一步到位。
+ * create_chart: Render Vega-Lite to SVG + register chart metadata in one step.
  */
 import { tool } from "@anthropic-ai/claude-agent-sdk";
 import { z } from "zod";
@@ -20,19 +20,19 @@ export const createChart = (ctx: TaskContext) =>
     "create_chart",
     "Render a Vega-Lite spec to SVG and register chart metadata in one step. The spec MUST include `data.values` inline. Returns { chart_id, file_path }.",
     {
-      title: z.string().describe("图表标题（人类可读）"),
+      title: z.string().describe("Chart title (human-readable)"),
       description: z
         .string()
-        .describe("一句话说明这图画的是什么（不是结论；结论是 Insight Agent 的工作）"),
+        .describe("One sentence describing what the chart shows (not a conclusion; conclusions are the Insight Agent's job)"),
       chart_type: z.enum(CHART_TYPES as [ChartType, ...ChartType[]]),
-      relevant_columns: z.array(z.string()).describe("该图涉及的列名"),
+      relevant_columns: z.array(z.string()).describe("Column names relevant to this chart"),
       vega_lite_spec: z
         .record(z.string(), z.any())
-        .describe("合法的 Vega-Lite v5 规格；必须含 data.values"),
+        .describe("Valid Vega-Lite v5 spec; must include data.values"),
     },
     async ({ title, description, chart_type, relevant_columns, vega_lite_spec }) => {
       try {
-        // ── 渲染 SVG ──────────────────────────────────────
+        // ── Render SVG ──────────────────────────────────────
         const spec: Record<string, unknown> = { ...(vega_lite_spec as Record<string, unknown>) };
         if (!spec.$schema) spec.$schema = "https://vega.github.io/schema/vega-lite/v5.json";
         if (!spec.width && !spec.height) {
@@ -45,7 +45,7 @@ export const createChart = (ctx: TaskContext) =>
         const data = (spec as { data?: { values?: unknown[] } }).data;
         if (!data || !Array.isArray(data.values) || data.values.length === 0) {
           return errorResult(
-            "vega_lite_spec.data.values 必须是非空数组 —— 把 get_column_values / compute_correlation 的返回值填进去",
+            "vega_lite_spec.data.values must be a non-empty array — fill it with return values from get_column_values / compute_correlation",
           );
         }
 
@@ -60,7 +60,7 @@ export const createChart = (ctx: TaskContext) =>
         const filePath = path.join(chartsDir, `${id}.svg`);
         await writeFile(filePath, svg, "utf-8");
 
-        // ── 注册元数据 ────────────────────────────────────
+        // ── Register metadata ────────────────────────────────────
         const meta: ChartMeta = {
           id,
           title,

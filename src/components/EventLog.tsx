@@ -1,26 +1,27 @@
 /**
- * EventLog —— 左侧实时日志面板。
+ * EventLog —— left-side real-time log panel.
  *
- * 把 useAgentStream 的 state 变化翻译成一条条带时间戳的日志条目，
- * 让用户能直观看到 agent 正在做什么（避免"看起来卡死"）。
+ * Translates state changes from useAgentStream into timestamped log entries,
+ * giving users a clear view of what the agent is doing (prevents the "appears frozen" feeling).
  *
- * 设计说明：
- * - 日志是"推导态"：纯从 state diff 累加出来的；一旦 state.upload 变 null（reset），
- *   整个日志重置。
- * - 之前的实现在 useMemo 内部 push 到 ref，依赖 React 永远只执行一次 memo。
- *   React 18 StrictMode 开发模式下每次 render 都会双调 useMemo（为了捕获副作用），
- *   会导致每条日志被 push 两次。这版改用 useEffect + useState —— effect 在提交后
- *   运行，保证"每次 state 变化 push 一次"。
+ * Design notes:
+ * - The log is "derived state": accumulated purely from state diffs; once state.upload becomes
+ *   null (reset), the entire log resets.
+ * - The previous implementation pushed to a ref inside useMemo, relying on React executing the
+ *   memo only once. Under React 18 StrictMode in development, useMemo is invoked twice per
+ *   render (to catch side effects), which caused each log entry to be pushed twice. This version
+ *   uses useEffect + useState — the effect runs after commit, ensuring each state change pushes
+ *   exactly once.
  *
- * 日志类型：
- *   - upload      蓝色    上传完成、列扫描就绪
- *   - agent       emerald/amber  agent 启停
- *   - tool        灰/emerald/coral  工具调用开始/结束/失败
- *   - chart       emerald  新图生成
- *   - insight     amber    洞察写入（summary / per_chart）
- *   - cost        muted    成本/耗时更新
- *   - done        emerald  全部完成
- *   - error       coral    错误
+ * Log types:
+ *   - upload      blue           upload complete, column scan ready
+ *   - agent       emerald/amber  agent start/stop
+ *   - tool        grey/emerald/coral  tool call start/end/failure
+ *   - chart       emerald        new chart generated
+ *   - insight     amber          insight written (summary / per_chart)
+ *   - cost        muted          cost/duration update
+ *   - done        emerald        all complete
+ *   - error       coral          error
  */
 import { useEffect, useRef, useState } from "react";
 import type { AgentStreamState, ToolInvocation } from "../hooks/useAgentStream";
@@ -45,7 +46,7 @@ interface LogEntry {
   detail?: string;
 }
 
-export interface EventLogProps {
+interface EventLogProps {
   state: AgentStreamState;
 }
 
@@ -86,7 +87,7 @@ export function EventLog({ state }: EventLogProps) {
 
   useEffect(() => {
     const seen = seenRef.current;
-    // 重置：upload 变 null 意味着用户点了 reset
+    // Reset: upload becoming null means the user clicked reset
     if (!state.upload) {
       seenRef.current = emptySeen();
       setEntries([]);
@@ -106,7 +107,7 @@ export function EventLog({ state }: EventLogProps) {
       });
     };
 
-    // 上传完成
+    // Upload complete
     if (!seen.upload) {
       const u = state.upload;
       push(
@@ -117,7 +118,7 @@ export function EventLog({ state }: EventLogProps) {
       seen.upload = true;
     }
 
-    // chart agent 生命周期
+    // Chart agent lifecycle
     const chartStatus = state.agentStatus.chart;
     if (chartStatus === "running" && !seen.chartStart) {
       push("agent", "chart agent started", "planning visualizations");
@@ -135,7 +136,7 @@ export function EventLog({ state }: EventLogProps) {
       seen.chartDone = true;
     }
 
-    // insight agent 生命周期
+    // Insight agent lifecycle
     const insightStatus = state.agentStatus.insight;
     if (insightStatus === "running" && !seen.insightStart) {
       push("agent", "insight agent started", "writing insights");
@@ -155,7 +156,7 @@ export function EventLog({ state }: EventLogProps) {
       seen.insightDone = true;
     }
 
-    // 工具调用
+    // Tool calls
     for (const tool of state.tools) {
       const prev = seen.toolState.get(tool.id);
       if (prev === tool.state) continue;
@@ -178,14 +179,14 @@ export function EventLog({ state }: EventLogProps) {
       }
     }
 
-    // 图表生成
+    // Chart generation
     for (const chart of state.charts) {
       if (seen.chartIds.has(chart.id)) continue;
       seen.chartIds.add(chart.id);
       push("chart", `new chart: ${chart.title}`, chart.chartType);
     }
 
-    // 洞察生成
+    // Insight generation
     for (const ins of state.insights) {
       const key = `${ins.kind}-${ins.chartId ?? "summary"}-${ins.text.slice(0, 24)}`;
       if (seen.insightKeys.has(key)) continue;
@@ -201,7 +202,7 @@ export function EventLog({ state }: EventLogProps) {
       }
     }
 
-    // 成本更新（只在 total 明显变化时记录）
+    // Cost update (only recorded when total changes meaningfully)
     const costKey = `${state.cost.total.toFixed(6)}`;
     if (costKey !== seen.costKey && state.cost.total > 0) {
       seen.costKey = costKey;
@@ -212,7 +213,7 @@ export function EventLog({ state }: EventLogProps) {
       );
     }
 
-    // 完成
+    // Complete
     if (state.done && !seen.done) {
       push(
         "done",
@@ -222,7 +223,7 @@ export function EventLog({ state }: EventLogProps) {
       seen.done = true;
     }
 
-    // 错误
+    // Error
     if (state.error && state.error !== seen.error) {
       push("error", "error", state.error);
       seen.error = state.error;
@@ -233,7 +234,7 @@ export function EventLog({ state }: EventLogProps) {
     }
   }, [state]);
 
-  // 新条目进来时自动滚到底部
+  // Auto-scroll to bottom when new entries arrive
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -279,7 +280,7 @@ function formatTime(ts: number): string {
 
 function toolArgs(t: ToolInvocation): string | undefined {
   if (!t.argsSummary) return undefined;
-  // 过长截断
+  // Truncate if too long
   return t.argsSummary.length > 80
     ? t.argsSummary.slice(0, 77) + "…"
     : t.argsSummary;

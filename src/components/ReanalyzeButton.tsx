@@ -1,12 +1,12 @@
 /**
- * ReanalyzeButton —— 分析完成后的"再来一次"CTA。
+ * ReanalyzeButton —— "analyze again" CTA shown after analysis completes.
  *
- * 风格跟 ReportActions 一个层级，但 emerald 主色（不是 accent），
- * 放在 Canvas 最底部、看完报告自然滚到的位置。
+ * Same visual tier as ReportActions, but with emerald as the primary color (not accent),
+ * placed at the very bottom of the Canvas where the user naturally scrolls after reading the report.
  */
 import styles from "./ReanalyzeButton.module.css";
 
-export interface ReanalyzeButtonProps {
+interface ReanalyzeButtonProps {
   onClick: () => void;
 }
 

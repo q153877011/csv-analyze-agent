@@ -35,8 +35,8 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 
-# IDE
-.vscode/
+# Claude Code generated files
+.claude/
 .idea/
 *.swp
 *.swo

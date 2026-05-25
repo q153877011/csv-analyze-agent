@@ -76,7 +76,7 @@
   height: auto;
   display: block;
   margin: 0 auto;
-  /* 轻微提亮背后，白底 SVG 也不显脏 */
+  /* Slightly brightens the background so white-background SVGs don't look dirty */
   background: #fff;
   border-radius: 6px;
   padding: 12px;

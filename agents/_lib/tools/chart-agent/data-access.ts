@@ -1,5 +1,5 @@
 /**
- * inspect_csv：一次性返回 CSV profile + 抽样行。
+ * inspect_csv: Return CSV profile + sampled rows in one call.
  */
 import { tool } from "@anthropic-ai/claude-agent-sdk";
 import { z } from "zod";
@@ -19,7 +19,7 @@ export const inspectCsv = (ctx: TaskContext) =>
         .min(1)
         .max(10)
         .optional()
-        .describe("抽样行数（1–10），默认 5"),
+        .describe("Number of sample rows (1–10), default 5"),
     },
     async ({ sample_n }) => {
       try {

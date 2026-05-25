@@ -1,5 +1,5 @@
 /**
- * POST /analyze/download — 下载报告
+ * POST /analyze/download — Download report
  *
  * body: { taskId, kind: "charts"|"insight"|"merged"|"html" }
  */

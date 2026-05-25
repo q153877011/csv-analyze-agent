@@ -1,11 +1,11 @@
 /* ─────────────────────────────────────────
- * theme.css — CSS 变量 + 全局 reset + 背景效果
- * 详见 plan/design.md §13
+ * theme.css — CSS variables + global reset + background effects
+ * See plan/design.md §13
  * ───────────────────────────────────────── */
 @import "tailwindcss";
 
 :root {
-  /* ─── 颜色 ─── */
+  /* ─── Colors ─── */
   --bg-void: #060608;
   --bg-raised-1: #0e0e11;
   --bg-raised-2: #1a1a1f;
@@ -26,19 +26,19 @@
   --glow-amber: 0 0 0 1px rgba(255, 181, 71, 0.22),
     0 0 32px rgba(255, 181, 71, 0.18);
 
-  /* ─── 字体 ─── */
+  /* ─── Fonts ─── */
   --font-display: "Clash Display", "Neue Machina", "Space Grotesk", sans-serif;
   --font-body: "Satoshi", -apple-system, BlinkMacSystemFont, "Helvetica Neue",
     sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
 
-  /* ─── 尺寸 ─── */
+  /* ─── Sizes ─── */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 20px;
 
-  /* ─── 曲线 ─── */
+  /* ─── Easing ─── */
   --ease-overshoot: cubic-bezier(0.22, 0.68, 0.32, 1.18);
   --ease-hero: cubic-bezier(0.76, 0, 0.24, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
@@ -83,7 +83,7 @@ button {
   padding: 0;
 }
 
-/* 全局噪点 */
+/* Global noise overlay */
 body::before {
   content: "";
   position: fixed;
@@ -96,7 +96,7 @@ body::before {
   mix-blend-mode: overlay;
 }
 
-/* CRT 扫描线（仅 agent 活动时） */
+/* CRT scanlines (only when agent is active) */
 body.agent-active::after {
   content: "";
   position: fixed;
@@ -126,13 +126,13 @@ body.agent-active::after {
   background: rgba(255, 255, 255, 0.18);
 }
 
-/* 选中态 */
+/* Selection state */
 ::selection {
   background: rgba(0, 255, 163, 0.28);
   color: var(--text-primary);
 }
 
-/* 全局 focus */
+/* Global focus */
 :focus-visible {
   outline: 2px solid var(--accent-emerald);
   outline-offset: 2px;

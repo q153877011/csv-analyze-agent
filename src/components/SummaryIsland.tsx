@@ -1,11 +1,11 @@
 /**
- * SummaryIsland：Insight Agent 的 summary 洞察。
- * 视觉权重一档以上，amber 柔光边。
+ * SummaryIsland: summary insight from the Insight Agent.
+ * One visual tier above regular insights, with an amber soft glow border.
  */
 import { motion } from "framer-motion";
 import styles from "./SummaryIsland.module.css";
 
-export interface SummaryIslandProps {
+interface SummaryIslandProps {
   text: string;
 }
 
@@ -18,7 +18,7 @@ export function SummaryIsland({ text }: SummaryIslandProps) {
       transition={{ duration: 0.52, ease: [0.76, 0, 0.24, 1] }}
     >
       <div className={styles.label}>SUMMARY</div>
-      <h2 className={styles.heading}>总体结论</h2>
+      <h2 className={styles.heading}>Overall Conclusions</h2>
       <p className={styles.body}>{text}</p>
     </motion.section>
   );

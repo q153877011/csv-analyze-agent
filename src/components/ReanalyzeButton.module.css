@@ -1,4 +1,4 @@
-/* ReanalyzeButton —— 大尺寸 CTA，完成分析后的自然落点 */
+/* ReanalyzeButton —— large-scale CTA, the natural landing point after analysis completes */
 
 .wrap {
   margin-top: 32px;
@@ -35,7 +35,7 @@
     background 220ms var(--ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
-/* 背景流光（hover 时激活） */
+/* Background shimmer (activated on hover) */
 .btn::before {
   content: "";
   position: absolute;

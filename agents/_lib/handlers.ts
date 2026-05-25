@@ -1,22 +1,22 @@
 /**
- * 路由处理器公共辅助。
+ * Route handler common utilities.
  */
 import type { Session } from "./session.js";
 import { getSession, touchSession } from "./session.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" } as const;
 
-/** 构造 JSON 响应 */
+/** Build a JSON response */
 export function jsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), { status, headers: JSON_HEADERS });
 }
 
-/** 构造错误 JSON 响应 */
+/** Build an error JSON response */
 export function errorResponse(error: string, status = 400): Response {
   return jsonResponse({ error }, status);
 }
 
-/** 获取并 touch session，不存在时返回 404 Response */
+/** Get and touch a session; returns a 404 Response if not found */
 export function getAndTouchSession(
   taskId: string | null,
 ): Session | Response {
@@ -32,8 +32,8 @@ export function getAndTouchSession(
 }
 
 /**
- * 从 EdgeOne context.request 获取 body。
- * EdgeOne runtime 对 JSON content-type 已自动解析为对象，直接取即可。
+ * Get the body from an EdgeOne context.request.
+ * EdgeOne runtime auto-parses JSON content-type into an object, so we can take it directly.
  */
 export function getRequestBody(
   request: any,

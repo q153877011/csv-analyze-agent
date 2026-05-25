@@ -64,7 +64,7 @@
   height: 100%;
   background: var(--bg-raised-3);
   border-radius: 1.5px;
-  /* v: 0..1 归一值；亮度 = 0.35 + 0.65 * v */
+  /* v: 0..1 normalized value; brightness = 0.35 + 0.65 * v */
   opacity: calc(0.35 + 0.65 * var(--v, 0));
   transform-origin: bottom;
   transform: scaleY(calc(0.5 + 0.5 * var(--v, 0)));
@@ -73,7 +73,7 @@
     transform 400ms var(--ease-smooth);
 }
 
-/* 类型着色 */
+/* Type-based coloring */
 .numeric {
   background: color-mix(in srgb, var(--accent-emerald) 65%, transparent);
 }

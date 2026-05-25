@@ -1,5 +1,5 @@
 /**
- * /analyze — 主路由（统一 POST）
+ * /analyze — Main route (unified POST)
  *
  * POST body.action="get"|"start"|"cancel"|"delete"
  */
@@ -84,12 +84,12 @@ async function handleStart(context: any, taskId: string, body: any): Promise<Res
       s.status = "done";
       const elapsed = Date.now() - t0;
       const patch = buildDonePatch(s, elapsed);
-      // 尝试写入（context 可能在响应后失效，此处仅乐观尝试）
+      // Attempt to persist (context may become invalid after the response; best-effort only)
       try {
         await appendAnalysisHistory(context, s, patch);
         await persistAnalysisArtifacts(context, s, patch.cost ?? { total: 0 }, elapsed);
       } catch {
-        // 若 context 已失效，handleDelete 会在下次请求中补写
+        // If context has expired, handleDelete will backfill on the next request
       }
     })
     .catch((err) => {
@@ -129,8 +129,8 @@ async function handleDelete(context: any, taskId: string): Promise<Response> {
   // deleted snapshot still shows what was accomplished before deletion.
   const summary = buildDonePatch(s, 0);
 
-  // 在销毁 session 前，确保完整制品已持久化到 store
-  // （此处有有效的 request context，不同于 .then() 后台回调）
+  // Before destroying the session, ensure full artifacts are persisted to the store
+  // (here we have a valid request context, unlike the .then() background callback)
   if (s.status === "done") {
     const doneEvt = s.events.find((e) => e.type === "done");
     const cost = doneEvt?.type === "done" ? doneEvt.cost : { total: 0 };

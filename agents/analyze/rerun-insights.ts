@@ -1,5 +1,5 @@
 /**
- * POST /analyze/rerun-insights — 复用已有 charts，仅重跑 Insight Agent
+ * POST /analyze/rerun-insights — Reuse existing charts, re-run the Insight Agent only
  */
 import { dispatch } from "../_lib/session.js";
 import { jsonResponse, errorResponse, getAndTouchSession, getRequestBody } from "../_lib/handlers.js";
@@ -56,7 +56,7 @@ export async function onRequest(context: any) {
       try {
         await appendAnalysisHistory(context, s, buildDonePatch(s, Date.now() - t0));
       } catch {
-        // context 可能已失效
+        // context may have expired
       }
     })
     .catch((err) => {

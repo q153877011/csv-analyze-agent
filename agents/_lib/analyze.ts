@@ -1,5 +1,5 @@
 /**
- * analyze()：两 agent 串行编排。
+ * analyze(): Two-agent sequential orchestration.
  */
 import { mkdir, readdir, unlink } from "node:fs/promises";
 import path from "node:path";
@@ -52,7 +52,7 @@ export async function analyze(opts: AnalyzeOptions): Promise<AnalyzeResult> {
     try {
       await writeProfile(ctx.outDir, ctx.cache.profile);
     } catch {
-      /* 预热写盘失败不致命 */
+      /* pre-warm profile write failed — non-fatal */
     }
   }
 
@@ -62,7 +62,7 @@ export async function analyze(opts: AnalyzeOptions): Promise<AnalyzeResult> {
   const taskId = opts.taskId ?? path.basename(ctx.outDir);
   const t0 = Date.now();
 
-  console.log(`\n🚀 CSV 分析启动`);
+  console.log(`\n🚀 CSV analysis started`);
   console.log(`   CSV   : ${ctx.csvPath}`);
   console.log(`   Out   : ${ctx.outDir}`);
   console.log(`   Model : ${model}`);
@@ -93,34 +93,34 @@ export async function analyze(opts: AnalyzeOptions): Promise<AnalyzeResult> {
       ctx.emit?.({ type: "agent", role: "chart", state: "done" });
     } else {
       ctx.emit?.({ type: "agent", role: "chart", state: "running" });
-      console.log("▶ Stage 1/2: Chart Agent 出图...");
+      console.log("▶ Stage 1/2: Chart Agent generating charts...");
       chartCost = await runChartAgent(ctx, model, opts);
       await reconcileOrphanCharts(ctx);
-      console.log(`✅ Chart Agent 完成，生成 ${ctx.charts.length} 张图\n`);
+      console.log(`✅ Chart Agent done, generated ${ctx.charts.length} charts\n`);
       ctx.emit?.({ type: "agent", role: "chart", state: "done" });
 
-      // 释放原始行数据——Insight Agent 只读缓存统计，不需要 raw rows
+      // Release raw row data — Insight Agent only reads cached stats, no raw rows needed
       ctx.cache.rows = null;
     }
 
-    // ── Agent 2: Insight（可选） ────────────────────────────
+    // ── Agent 2: Insight (optional) ────────────────────────────
     let insightCost: number | undefined;
     if (!chartsOnly) {
       if (ctx.charts.length === 0) {
-        console.warn("⚠️  Chart Agent 未生成任何图表，跳过 Insight Agent");
+        console.warn("⚠️  Chart Agent produced no charts, skipping Insight Agent");
         ctx.emit?.({ type: "agent", role: "insight", state: "skipped" });
       } else {
         ctx.emit?.({ type: "agent", role: "insight", state: "running" });
-        console.log("▶ Stage 2/2: Insight Agent 写洞察...");
+        console.log("▶ Stage 2/2: Insight Agent writing insights...");
         insightCost = await runInsightAgent(ctx, model, opts);
-        console.log(`✅ Insight Agent 完成，写入 ${ctx.insights.length} 条洞察\n`);
+        console.log(`✅ Insight Agent done, wrote ${ctx.insights.length} insights\n`);
         ctx.emit?.({ type: "agent", role: "insight", state: "done" });
       }
     } else {
       ctx.emit?.({ type: "agent", role: "insight", state: "skipped" });
     }
 
-    // ── 组装 ───────────────────────────────────────────────
+    // ── Assembly ───────────────────────────────────────────────
     const out = await assembleReports(ctx, { chartsOnly });
     const durationMs = Date.now() - t0;
     const total = (chartCost ?? 0) + (insightCost ?? 0);
@@ -174,14 +174,14 @@ export async function analyze(opts: AnalyzeOptions): Promise<AnalyzeResult> {
 // ─────────────────────────────────────────────────────────
 
 /**
- * 构造 Chart Agent 的 prompt——把预热好的 profile 摘要注入，
- * 减少一次 profile_csv 工具调用并防止 Agent 幻觉列名。
+ * Build Chart Agent's prompt — inject the pre-warmed profile summary
+ * to save a profile_csv tool call and prevent the Agent from hallucinating column names.
  */
 function buildChartAgentPrompt(ctx: TaskContext): string {
   const p = ctx.cache.profile;
   if (!p) {
-    // 无预热 profile（极少见），降级为原始方式
-    return `请为这份 CSV 生成 3–6 张图表：${ctx.csvPath}。首先调用 inspect_csv。`;
+    // No pre-warmed profile (very rare), fall back to raw approach
+    return `Please generate 3–6 charts for this CSV: ${ctx.csvPath}. Start by calling inspect_csv.`;
   }
 
   const colSummary = p.columns
@@ -201,17 +201,17 @@ function buildChartAgentPrompt(ctx: TaskContext): string {
     })
     .join("\n  ");
 
-  const chartTarget = ctx.demoMode ? "恰好 3 张" : "3–6 张有信息量的";
+  const chartTarget = ctx.demoMode ? "exactly 3" : "3–6 informative";
   const demoSuffix = ctx.demoMode
-    ? "\n\n**不要调用 inspect_csv**——以上 profile 已足够。严格生成 3 张图，不要多。"
-    : "\n你仍可调用 inspect_csv 获取完整统计（含 quantiles/topValues）和实际数据样本。";
+    ? "\n\n**Do not call inspect_csv** — the profile above is sufficient. Generate strictly 3 charts, no more."
+    : "\nYou may still call inspect_csv to get full statistics (including quantiles/topValues) and actual data samples.";
 
-  return `CSV 文件：${path.basename(ctx.csvPath)}
-行数：${p.rows}${p.sampledRows < p.rows ? `（已抽样 ${p.sampledRows} 行）` : ""}
-列（${p.columns.length} 个）：
+  return `CSV file: ${path.basename(ctx.csvPath)}
+Rows: ${p.rows}${p.sampledRows < p.rows ? ` (sampled ${p.sampledRows} rows)` : ""}
+Columns (${p.columns.length}):
   ${colSummary}
 
-请基于以上 profile 生成 ${chartTarget}图表。${demoSuffix}`;
+Based on the profile above, generate ${chartTarget} charts.${demoSuffix}`;
 }
 
 async function runChartAgent(
@@ -286,8 +286,8 @@ async function runInsightAgent(
     ],
     systemPrompt: demo ? INSIGHT_AGENT_PROMPT_DEMO : INSIGHT_AGENT_PROMPT,
     prompt: demo
-      ? "请为每张图写 1–2 句洞察，再写 2–3 句总结。首先调用 read_context。"
-      : "请根据前一步生成的图表和数据摘要，为每张图写洞察并给出总体结论。首先调用 read_context。",
+      ? "Write 1–2 sentences of insight per chart, then a 2–3 sentence summary. Start by calling read_context."
+      : "Based on the charts and data summary from the previous step, write insights for each chart and provide an overall conclusion. Start by calling read_context.",
     model,
     maxTurns: opts.maxTurns ?? (demo ? 8 : 15),
     maxBudgetUsd: opts.maxBudgetUsd ?? (demo ? 0.04 : 0.2),
@@ -296,7 +296,7 @@ async function runInsightAgent(
 }
 
 // ─────────────────────────────────────────────────────────
-// 公共执行器
+// Common executor
 // ─────────────────────────────────────────────────────────
 interface RunAgentParams {
   ctx: TaskContext;
@@ -428,7 +428,7 @@ async function runAgent(params: RunAgentParams): Promise<number | undefined> {
         costUsd = msg.total_cost_usd;
         if (msg.subtype !== "success") {
           throw new Error(
-            `${params.mcpName} 结束异常：${msg.subtype}${
+            `${params.mcpName} ended abnormally: ${msg.subtype}${
               "error" in msg ? " — " + (msg as { error?: string }).error : ""
             }`,
           );

@@ -1,4 +1,4 @@
-/* SamplePicker —— 保持 Dark OLED Luxury 风格，和 DropZone 的视觉语言对齐 */
+/* SamplePicker —— maintains Dark OLED Luxury aesthetic, aligned with DropZone's visual language */
 
 .wrap {
   display: flex;
@@ -100,7 +100,7 @@
   pointer-events: none;
 }
 
-/* 加载态：emerald 脉冲边 */
+/* Loading state: emerald pulse border */
 .card.loading {
   border-color: rgba(0, 255, 163, 0.45);
   background: rgba(0, 255, 163, 0.05);
@@ -131,7 +131,7 @@
   }
 }
 
-/* 卡片内部 */
+/* Card internals */
 .cardTop {
   display: flex;
   justify-content: space-between;

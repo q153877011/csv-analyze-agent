@@ -1,5 +1,5 @@
 /**
- * StatusBar：底部浮动状态栏。显示 agent 身份 + tool chips 滚动 + 耗时/成本。
+ * StatusBar: floating bottom status bar. Displays agent identity + scrollable tool chips + elapsed time / cost.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ToolInvocation } from "../hooks/useAgentStream";
@@ -7,7 +7,7 @@ import type { AgentRole, AgentState } from "../lib/events";
 import { ToolChip } from "./ToolChip";
 import styles from "./StatusBar.module.css";
 
-export interface StatusBarProps {
+interface StatusBarProps {
   tools: ToolInvocation[];
   agentStatus: Record<AgentRole, AgentState | "idle">;
   durationMs: number;
@@ -25,7 +25,7 @@ export function StatusBar({
   const [now, setNow] = useState(() => Date.now());
   const startRef = useRef<number | null>(null);
 
-  // 当 agent 开始活跃时起表
+  // Start the timer when the agent becomes active
   useEffect(() => {
     const active =
       agentStatus.chart === "running" || agentStatus.insight === "running";
@@ -33,7 +33,7 @@ export function StatusBar({
       startRef.current = Date.now();
     }
     if (!active) {
-      // 停止时间条——但保留 durationMs prop 作为最终值
+      // Stop the timer — but keep the durationMs prop as the final value
     }
   }, [agentStatus]);
 

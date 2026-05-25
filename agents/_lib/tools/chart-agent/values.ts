@@ -1,5 +1,5 @@
 /**
- * get_column_values：某列 top-K 取值 + 频次 + 直方图 + 数值摘要。
+ * get_column_values: Top-K values + frequency + histogram + numeric summary for a column.
  */
 import { tool } from "@anthropic-ai/claude-agent-sdk";
 import { z } from "zod";
@@ -16,14 +16,14 @@ export const getColumnValues = (ctx: TaskContext) => {
     "get_column_values",
     "Get top-K values + histogram + numeric summary for a single column. Use this before rendering a bar/pie/histogram chart so you have a small, model-friendly payload to put into data.values.",
     {
-      column: z.string().describe("列名（必须存在于 CSV 中）"),
+      column: z.string().describe("Column name (must exist in the CSV)"),
       limit: z
         .number()
         .int()
         .min(1)
         .max(maxLimit)
         .optional()
-        .describe(`top-K 的 K，默认 ${defaultLimit}`),
+        .describe(`K for top-K, default ${defaultLimit}`),
     },
     async ({ column, limit }) => {
       try {

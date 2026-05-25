@@ -1,21 +1,21 @@
 /**
- * SamplePicker —— 预制 CSV 数据选择器。
+ * SamplePicker —— pre-built CSV dataset selector.
  *
- * 放在 DropZone 下方，用户点击任意一张卡片即可快速体验模版，
- * 走和手动上传完全一样的 onFile 流程。
+ * Placed below the DropZone; clicking any card lets users quickly try a template,
+ * going through the exact same onFile flow as a manual upload.
  *
- * 数据文件从 /public/mock/ 提供，部署时会作为静态资源和前端一起打包。
+ * Data files are served from /public/mock/ and bundled as static assets with the frontend at deploy time.
  */
 import { useState } from "react";
 import styles from "./SamplePicker.module.css";
 
 export interface SampleDataset {
-  file: string;            // public 路径，如 /mock/employees.csv
-  name: string;            // 文件名，如 employees.csv（传给 onFile 用）
-  title: string;           // 展示标题
+  file: string;            // public path, e.g. /mock/employees.csv
+  name: string;            // filename, e.g. employees.csv (passed to onFile)
+  title: string;           // display title
   meta: string;            // "50 × 11"
-  hint: string;            // 一句话介绍用途
-  icon: string;            // emoji 或 2 字符标记
+  hint: string;            // one-line description
+  icon: string;            // emoji or 2-character marker
 }
 
 const SAMPLES: SampleDataset[] = [
@@ -24,7 +24,7 @@ const SAMPLES: SampleDataset[] = [
     name: "employees.csv",
     title: "Employees",
     meta: "40 × 7",
-    hint: "部门 · 职级 · 薪资分布",
+    hint: "Department · Seniority · Salary distribution",
     icon: "👥",
   },
   {
@@ -32,7 +32,7 @@ const SAMPLES: SampleDataset[] = [
     name: "sales_2025.csv",
     title: "E-commerce Sales",
     meta: "48 × 8",
-    hint: "地区 · 品类 · 时间序列",
+    hint: "Region · Category · Time series",
     icon: "🛒",
   },
   {
@@ -40,7 +40,7 @@ const SAMPLES: SampleDataset[] = [
     name: "restaurant_reviews.csv",
     title: "Restaurant Reviews",
     meta: "40 × 7",
-    hint: "价格 vs 评分相关性",
+    hint: "Price vs rating correlation",
     icon: "🍽️",
   },
   {
@@ -48,12 +48,12 @@ const SAMPLES: SampleDataset[] = [
     name: "users_behavior.csv",
     title: "SaaS User Behavior",
     meta: "40 × 7",
-    hint: "留存 · MRR · 付费分层",
+    hint: "Retention · MRR · Paid tiers",
     icon: "📈",
   },
 ];
 
-export interface SamplePickerProps {
+interface SamplePickerProps {
   onPick: (file: File) => Promise<void>;
   disabled?: boolean;
 }
@@ -71,7 +71,7 @@ export function SamplePicker({ onPick, disabled }: SamplePickerProps) {
       const file = new File([blob], s.name, { type: "text/csv" });
       await onPick(file);
     } catch (e) {
-      // 出错时短暂反馈后解除
+      // On error, briefly show feedback then clear
       console.error(e);
     } finally {
       setLoadingKey(null);

@@ -1,8 +1,8 @@
 /**
- * POST /upload — 文件上传处理
+ * POST /upload — File upload handler
  *
- * EdgeOne Pages Functions 的 context.request.body 对 multipart 是原始 Buffer，
- * 需要手动解析。
+ * EdgeOne Pages Functions provides context.request.body as a raw Buffer for multipart requests;
+ * manual parsing is required.
  */
 import path from "node:path";
 import { mkdir, writeFile } from "node:fs/promises";

@@ -1,10 +1,10 @@
 /**
- * ToolChip：底部状态栏里的单个 tool 状态徽标。
+ * ToolChip: a single tool status badge in the bottom status bar.
  */
 import styles from "./ToolChip.module.css";
 import type { ToolInvocation } from "../hooks/useAgentStream";
 
-export interface ToolChipProps {
+interface ToolChipProps {
   tool: ToolInvocation;
   onClick?: () => void;
 }

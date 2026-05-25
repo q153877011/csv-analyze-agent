@@ -1,7 +1,7 @@
 /**
- * POST /history/detail — 获取某次分析的完整制品（SVG、insights、报告）
+ * POST /history/detail — Retrieve the full artifacts for an analysis (SVG, insights, report)
  *
- * 优先从 context.store 读取；如果 store 中没有，尝试从 live session 实时构建。
+ * Reads from context.store first; falls back to building live from session if not found in store.
  */
 import { jsonResponse, errorResponse, getRequestBody } from "../_lib/handlers.js";
 import { getSession, type Session } from "../_lib/session.js";
@@ -37,7 +37,7 @@ export async function onRequest(context: any) {
   const conversationId: string = context.conversation_id ?? "";
   const store = context.store ?? null;
 
-  // 1. 尝试从 store 读取
+  // 1. Try reading from the store
   if (store && conversationId) {
     try {
       const messages: StoreMessage[] = await store.getMessages({
@@ -65,7 +65,7 @@ export async function onRequest(context: any) {
     }
   }
 
-  // 2. Fallback：从 live session + 磁盘文件实时构建
+  // 2. Fallback: build from live session + disk files
   const session = getSession(taskId);
   if (session && (session.status === "done" || session.status === "error")) {
     try {
@@ -83,26 +83,26 @@ export async function onRequest(context: any) {
 }
 
 /**
- * 从 live session 的磁盘文件实时构建 artifacts（无需 store）
+ * Build artifacts from a live session's disk files (no store required)
  */
 async function buildArtifactsFromSession(
   session: Session,
 ): Promise<AnalysisArtifacts | null> {
   const events = session.events ?? [];
 
-  // 提取 charts 和 insights
+  // Extract charts and insights
   const charts = extractChartsFromEvents(events);
   if (charts.length === 0) return null;
 
   const insights = extractInsightsFromEvents(events);
 
-  // 并行加载 SVG 和报告
+  // Load SVGs and report in parallel
   const [svgs, reportHtml] = await Promise.all([
     loadChartSvgs(session.outDir, charts),
     loadReportHtml(session.outDir),
   ]);
 
-  // 从 done 事件获取 cost 和 duration
+  // Get cost and duration from the done event
   const doneEvt = events.find((e) => e.type === "done");
   const cost = doneEvt?.type === "done"
     ? doneEvt.cost

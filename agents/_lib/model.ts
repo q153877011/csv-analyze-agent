@@ -1,8 +1,8 @@
 /**
- * AI Gateway 调试版配置。
+ * AI Gateway configuration.
  *
- * Claude Agent SDK 子进程仍读取 Anthropic 协议环境变量，
- * 所以这里把 AI_GATEWAY_* 映射成 ANTHROPIC_* 传给 SDK。
+ * Claude Agent SDK subprocesses still read Anthropic protocol env vars,
+ * so we map AI_GATEWAY_* to ANTHROPIC_* for the SDK.
  */
 import "dotenv/config";
 

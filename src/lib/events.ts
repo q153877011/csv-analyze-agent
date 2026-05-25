@@ -1,6 +1,6 @@
 /**
- * 前端事件类型，镜像 agents/src/events.ts。
- * 这个文件是前后端"接口契约"的唯一前端副本——一旦后端改，这里要同步。
+ * Frontend event types, mirroring agents/src/events.ts.
+ * This file is the sole frontend copy of the frontend-backend "interface contract" — if backend changes, this must be synced.
  */
 import type { ChartMeta, Insight } from "../types";
 

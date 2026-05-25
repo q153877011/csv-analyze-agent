@@ -1,10 +1,10 @@
 /**
- * 所有 agent 之间共享的类型定义。
+ * Shared type definitions across all agents.
  */
 import type { EventEmitter } from "./events.js";
 
 // ──────────────────────────────────────────────────────
-// CSV 列类型与 profile
+// CSV column types and profile
 // ──────────────────────────────────────────────────────
 
 export type SemanticType =
@@ -42,7 +42,7 @@ export interface CsvProfile {
 }
 
 // ──────────────────────────────────────────────────────
-// 图表元数据
+// Chart metadata
 // ──────────────────────────────────────────────────────
 
 export type ChartType =
@@ -68,7 +68,7 @@ export interface ChartMeta {
 }
 
 // ──────────────────────────────────────────────────────
-// 洞察
+// Insights
 // ──────────────────────────────────────────────────────
 
 export type InsightKind = "per_chart" | "summary";
@@ -122,7 +122,7 @@ export interface CorrelationResult {
 }
 
 // ──────────────────────────────────────────────────────
-// Agent 选项
+// Agent options
 // ──────────────────────────────────────────────────────
 
 export interface AnalyzeOptions {

@@ -4,7 +4,7 @@
 
 // export default defineConfig({
 //   plugins: [react(), tailwind()],
-//   // vega/vega-lite 是纯后端依赖，前端不用；排除可避免 dep optimization metadata 过大导致 431
+//   // vega/vega-lite is a backend-only dep; excluding avoids dep optimization metadata too large causing 431
 //   optimizeDeps: {
 //     exclude: ["vega", "vega-lite", "vega-util", "vega-loader", "vega-scenegraph"],
 //   },

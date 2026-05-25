@@ -5,7 +5,7 @@
  * Shown inline on the homepage when idle — no toggle needed.
  */
 import type { HistoryRecordWithRestore } from "../lib/api";
-import { formatSize, formatDuration, formatCost } from "../lib/format";
+import { formatDuration, formatCost } from "../lib/format";
 import css from "./HistoryPanel.module.css";
 
 interface HistoryPanelProps {

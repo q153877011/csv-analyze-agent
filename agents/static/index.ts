@@ -1,5 +1,5 @@
 /**
- * POST /static — 提供 session outDir 下的静态文件
+ * POST /static — Serve static files from a session's outDir
  *
  * body: { taskId, path: "charts/chart-1.svg" }
  */

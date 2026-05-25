@@ -1,29 +1,29 @@
 /**
- * ColumnScan：ACT 2 的核心可视化。
+ * ColumnScan: core visualization for ACT 2.
  *
- * 每列一行，60 个 div 方块代表归一化的分布值。
- * 颜色映射：
+ * One row per column; 60 div blocks represent normalized distribution values.
+ * Color mapping:
  *   numeric   → emerald
  *   datetime  → cyan
  *   categorical / boolean → blue
  *   id        → muted grey
  *   text      → dimmed
  *
- * Scanline 效果：行内依次亮起（CSS stagger）；外层用一条 sweeping line 作为额外视觉。
+ * Scanline effect: rows light up in sequence (CSS stagger); an outer sweeping line adds additional visual flair.
  */
 import { useMemo } from "react";
 import type { ColumnDistribution } from "../types";
 import styles from "./ColumnScan.module.css";
 
-export interface ColumnScanProps {
+interface ColumnScanProps {
   distributions: ColumnDistribution[];
-  /** 是否处于"正在扫描"态——控制 sweeping 线 */
+  /** Whether the component is in "scanning" state — controls the sweeping line */
   scanning: boolean;
 }
 
 export function ColumnScan({ distributions, scanning }: ColumnScanProps) {
   const rows = useMemo(
-    () => distributions.slice(0, 24), // 多于 24 列的截断，保持画面密度
+    () => distributions.slice(0, 24), // Truncate beyond 24 columns to maintain visual density
     [distributions],
   );
   return (

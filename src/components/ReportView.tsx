@@ -1,6 +1,6 @@
 /**
- * ReportView：历史分析报告的全页视图。
- * 从 context.store 加载完整制品后渲染。
+ * ReportView: full-page view for historical analysis reports.
+ * Renders after loading complete artifacts from context.store.
  */
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -13,7 +13,7 @@ import { SummaryIsland } from "./SummaryIsland";
 import { MeshGradient } from "./MeshGradient";
 import styles from "./ReportView.module.css";
 
-export interface ReportViewProps {
+interface ReportViewProps {
   taskId: string;
   conversationId: string;
   onBack: () => void;

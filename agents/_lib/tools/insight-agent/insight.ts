@@ -1,5 +1,5 @@
 /**
- * save_insight：追加一条洞察到 ctx.insights。
+ * save_insight: Append an insight to ctx.insights.
  */
 import { tool } from "@anthropic-ai/claude-agent-sdk";
 import { z } from "zod";
@@ -16,11 +16,11 @@ export const saveInsight = (ctx: TaskContext) =>
       chart_id: z
         .string()
         .optional()
-        .describe("kind=per_chart 时必填；应来自 read_chart_meta"),
+        .describe("Required when kind=per_chart; should come from read_chart_meta"),
       text: z
         .string()
         .min(1)
-        .describe("2–4 句洞察（per_chart）或 3–5 句结论（summary）；必须引用具体数字"),
+        .describe("2–4 sentence insight (per_chart) or 3–5 sentence conclusion (summary); must cite specific numbers"),
       kind: z.enum(["per_chart", "summary"]),
     },
     async ({ chart_id, text, kind }) => {

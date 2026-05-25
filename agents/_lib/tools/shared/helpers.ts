@@ -1,5 +1,5 @@
 /**
- * 工具通用辅助：textResult / errorResult
+ * Common tool helpers: textResult / errorResult
  */
 
 export function textResult(payload: unknown) {

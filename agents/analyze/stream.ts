@@ -1,7 +1,7 @@
 /**
- * POST /analyze/stream — SSE 流
+ * POST /analyze/stream — SSE stream
  *
- * EdgeOne runtime 不传 query params，所以前端用 POST + body {taskId} 发起 SSE 连接。
+ * EdgeOne runtime does not pass query params, so the frontend initiates SSE via POST + body {taskId}.
  */
 import { formatSse } from "../_lib/session.js";
 import { errorResponse, getAndTouchSession, getRequestBody } from "../_lib/handlers.js";

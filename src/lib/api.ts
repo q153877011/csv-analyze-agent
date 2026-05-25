@@ -1,17 +1,17 @@
 /**
- * 前端 → 后端 HTTP / SSE 封装。
+ * Frontend → Backend HTTP / SSE wrapper.
  *
- * EdgeOne Pages Functions 路由（全部 POST）：
- *   POST /upload                  → multipart 上传 CSV
+ * EdgeOne Pages Functions routes (all POST):
+ *   POST /upload                  → multipart CSV upload
  *   POST /analyze                 → body:{taskId, action:"get"|"start"|"cancel"|"delete"}
- *   POST /analyze/stream          → body:{taskId} → SSE 流（fetch streaming）
+ *   POST /analyze/stream          → body:{taskId} → SSE stream (fetch streaming)
  *   POST /analyze/rerun-insights  → body:{taskId}
  *   POST /analyze/download        → body:{taskId, kind}
  *   POST /static                  → body:{taskId, path}
- *   POST /history                 → 读取分析历史记录
- *   POST /history/detail          → 获取完整分析制品
+ *   POST /history                 → fetch analysis history
+ *   POST /history/detail          → get full analysis artifacts
  *
- * 开发模式下通过 vite proxy 把这些路由转发到 localhost:8088。
+ * In dev mode, vite proxy forwards these routes to localhost:8088.
  */
 import type { AgentEvent } from "./events";
 import type { UploadResponse, CsvProfile, ChartMeta, Insight } from "../types";
@@ -66,7 +66,7 @@ export async function uploadCsv(
 ): Promise<UploadResponse> {
   const form = new FormData();
   form.append("file", file);
-  // multipart 不设 Content-Type，浏览器自动加 boundary；只加 conversation header
+  // multipart: don't set Content-Type, browser auto-adds boundary; only add conversation header
   const res = await fetch("/upload", {
     method: "POST",
     headers: conversationHeaders(conversationId),
@@ -135,24 +135,6 @@ export async function rerunInsights(
   }
 }
 
-export async function deleteSession(
-  taskId: string,
-  conversationId?: string,
-): Promise<void> {
-  try {
-    await fetch("/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...conversationHeaders(conversationId),
-      },
-      body: JSON.stringify({ taskId, action: "delete" }),
-    });
-  } catch {
-    /* best effort */
-  }
-}
-
 export interface SessionSnapshot {
   taskId: string;
   status: "uploaded" | "running" | "done" | "error";
@@ -191,39 +173,31 @@ export async function fetchSession(
 // ─── History API ────────────────────────────────────────────
 
 /**
- * 获取当前 conversation 的分析历史记录。
- * 带 409 重试（React StrictMode 双渲染可能触发）。
+ * Fetch the current conversation's analysis history.
+ * Includes 409 retry (React StrictMode double-render may trigger it).
  */
 export async function fetchAnalysisHistory(
   conversationId: string,
 ): Promise<HistoryRecordWithRestore[]> {
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      const res = await fetch("/history", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...conversationHeaders(conversationId),
-        },
-        body: JSON.stringify({}),
-      });
+  try {
+    const res = await fetch("/history", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...conversationHeaders(conversationId),
+      },
+      body: JSON.stringify({}),
+    });
 
-      if (res.status === 409) {
-        await new Promise((r) => setTimeout(r, 500));
-        continue;
-      }
+    if (!res.ok) return [];
 
-      if (!res.ok) return [];
-
-      const data = (await res.json().catch(() => null)) as {
-        records?: HistoryRecordWithRestore[];
-      } | null;
-      return Array.isArray(data?.records) ? data.records : [];
-    } catch {
-      return [];
-    }
+    const data = (await res.json().catch(() => null)) as {
+      records?: HistoryRecordWithRestore[];
+    } | null;
+    return Array.isArray(data?.records) ? data.records : [];
+  } catch {
+    return [];
   }
-  return [];
 }
 
 // ─── History Detail (full artifacts) ───────────────────────
@@ -248,7 +222,7 @@ export interface AnalysisArtifacts {
 }
 
 /**
- * 获取某次分析的完整制品（SVG、insights、报告）。
+ * Fetch full artifacts for a specific analysis (SVG, insights, report).
  */
 export async function fetchHistoryDetail(
   taskId: string,
@@ -274,10 +248,10 @@ export async function fetchHistoryDetail(
 // ─── SSE Stream ─────────────────────────────────────────────
 
 /**
- * 订阅 SSE 流（使用 fetch streaming 代替 EventSource，因为 EdgeOne 不支持 GET query params）。
- * 返回 unsubscribe。
+ * Subscribe to SSE stream (uses fetch streaming instead of EventSource because EdgeOne doesn't support GET query params).
+ * Returns unsubscribe function.
  *
- * 注意：SSE 长连接不带 conversation header，避免 EdgeOne runtime 对并发请求返回 409。
+ * Note: SSE long connection does not carry conversation header to avoid EdgeOne runtime returning 409 on concurrent requests.
  */
 export function subscribeStream(
   taskId: string,
@@ -318,7 +292,6 @@ export function subscribeStream(
         for (const frame of frames) {
           if (!frame.trim() || frame.startsWith(":")) continue; // comment/keepalive
 
-          const eventMatch = frame.match(/^event:\s*(.+)$/m);
           const dataMatch = frame.match(/^data:\s*(.+)$/m);
 
           if (!dataMatch) continue;
@@ -375,7 +348,7 @@ function fnv1a(s: string): string {
 }
 
 /**
- * 手动触发文件下载（POST 方式获取文件内容后创建 blob URL）
+ * Manually trigger file download (POST to get file content then create blob URL)
  */
 export async function downloadReport(
   taskId: string,
@@ -400,8 +373,8 @@ export async function downloadReport(
 }
 
 /**
- * 拉一张 SVG 的文本。
- * svgUrl 格式："{taskId}/{relPath}"（由后端 dispatch 注入）
+ * Fetch an SVG's text content.
+ * svgUrl format: "{taskId}/{relPath}" (injected by backend dispatch)
  */
 export async function fetchSvg(svgUrl: string): Promise<string> {
   const slashIdx = svgUrl.indexOf("/");

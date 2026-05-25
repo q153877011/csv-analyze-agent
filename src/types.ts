@@ -1,6 +1,6 @@
 /**
- * 前端共用的业务类型，与后端 agents/src/types.ts 对齐。
- * 只镜像 *前端真正要用* 的字段，不求完全一致。
+ * Shared business types for the frontend, aligned with backend agents/src/types.ts.
+ * Only mirrors fields the *frontend actually uses*, not an exact copy.
  */
 
 export type SemanticType =
@@ -62,7 +62,7 @@ export interface ChartMeta {
   relevantColumns: string[];
   filePath: string;
   relPath: string;
-  /** 后端附加：可直接拿去做 fetch/inline SVG 的地址 */
+  /** Backend-appended: URL that can be directly used for fetch/inline SVG */
   svgUrl?: string;
 }
 

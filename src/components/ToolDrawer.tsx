@@ -1,11 +1,11 @@
 /**
- * ToolDrawer：点击 chip 时右侧滑出，显示工具 args/result/error 的 JSON。
+ * ToolDrawer: slides out from the right when a chip is clicked, displaying the tool's args/result/error as JSON.
  */
 import { AnimatePresence, motion } from "framer-motion";
 import type { ToolInvocation } from "../hooks/useAgentStream";
 import styles from "./ToolDrawer.module.css";
 
-export interface ToolDrawerProps {
+interface ToolDrawerProps {
   tool: ToolInvocation | null;
   onClose: () => void;
 }

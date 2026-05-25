@@ -1,4 +1,4 @@
-/* EventLog —— Dark OLED 风，像 devtools 终端 */
+/* EventLog —— Dark OLED style, like a devtools terminal */
 
 .panel {
   display: flex;
@@ -7,7 +7,7 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-md, 8px);
   overflow: hidden;
-  /* 占满剩余高度 */
+  /* Fill remaining height */
   flex: 1 1 auto;
   min-height: 220px;
   max-height: 50vh;
@@ -148,7 +148,7 @@
   font-size: 10.5px;
 }
 
-/* 按 kind 上色 */
+/* Color by kind */
 .item[data-kind="upload"] {
   border-left-color: var(--accent-cyan, #7de3f0);
 }

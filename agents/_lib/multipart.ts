@@ -1,8 +1,8 @@
 /**
- * 轻量 multipart/form-data 解析器。
+ * Lightweight multipart/form-data parser.
  *
- * EdgeOne Pages Functions 的 Node runtime 对 multipart body 只返回原始 Buffer，
- * 不提供 request.formData()。这里手动解析 boundary + 提取文件字段。
+ * EdgeOne Pages Functions' Node runtime only returns a raw Buffer for multipart body,
+ * and does not provide request.formData(). Here we manually parse boundaries and extract file fields.
  */
 
 export interface ParsedFile {
@@ -18,7 +18,7 @@ export interface MultipartResult {
 }
 
 /**
- * 从 content-type header 提取 boundary
+ * Extract boundary from the content-type header
  */
 function extractBoundary(contentType: string): string | null {
   const match = contentType.match(/boundary=(?:"([^"]+)"|([^\s;]+))/i);
@@ -26,7 +26,7 @@ function extractBoundary(contentType: string): string | null {
 }
 
 /**
- * 解析 multipart/form-data Buffer
+ * Parse multipart/form-data Buffer
  */
 export function parseMultipart(body: Buffer, contentType: string): MultipartResult {
   const boundary = extractBoundary(contentType);

@@ -1,6 +1,6 @@
 /**
- * 磁盘缓存辅助：Chart Agent 计算出来的统计量写到 outDir 下，
- * Insight Agent 的 read_* 工具从同一个位置读。
+ * Disk cache helpers: statistics computed by the Chart Agent are written under outDir,
+ * and the Insight Agent's read_* tools read from the same location.
  */
 import { mkdir, writeFile, readFile, access } from "node:fs/promises";
 import path from "node:path";

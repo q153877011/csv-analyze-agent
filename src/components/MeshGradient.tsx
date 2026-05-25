@@ -1,6 +1,6 @@
 /**
- * 背景极光 mesh——纯 CSS，2% 透明度的 radial-gradient 拼接。
- * 位置在右上/右下，缓慢呼吸 30s。
+ * Background aurora mesh — pure CSS, stitched radial-gradients at 2% opacity.
+ * Positioned top-right / bottom-right, slowly breathing over 30s.
  */
 import styles from "./MeshGradient.module.css";
 

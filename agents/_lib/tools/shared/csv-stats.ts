@@ -1,5 +1,5 @@
 /**
- * CSV 解析 + 语义类型推断 + 基础统计。
+ * CSV parsing + semantic type inference + basic statistics.
  */
 import Papa from "papaparse";
 import { readFile } from "node:fs/promises";
@@ -56,7 +56,7 @@ export async function loadCsv(csvPath: string): Promise<{
     transformHeader: (h) => h.trim(),
   });
   if (parsed.errors.length && parsed.data.length === 0) {
-    throw new Error(`CSV 解析失败：${parsed.errors[0]?.message}`);
+    throw new Error(`CSV parse failed: ${parsed.errors[0]?.message}`);
   }
   const all = parsed.data as Record<string, unknown>[];
   const totalRows = all.length;
@@ -95,7 +95,7 @@ function looksLikeDate(v: string): boolean {
   return false;
 }
 
-export function inferSemanticType(
+function inferSemanticType(
   name: string,
   values: unknown[],
 ): { semantic: SemanticType; raw: "number" | "string" | "boolean" | "date" } {
@@ -136,7 +136,7 @@ export function inferSemanticType(
   return { semantic: "text", raw: "string" };
 }
 
-export function profileColumn(
+function profileColumn(
   name: string,
   values: unknown[],
 ): ColumnProfile {
@@ -212,7 +212,7 @@ export function computeProfile(
   };
 }
 
-export function topK(
+function topK(
   values: unknown[],
   k: number,
 ): Array<{ value: string; count: number }> {

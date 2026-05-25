@@ -1,12 +1,12 @@
 /**
- * ReportActions：done 之后的下载动作栏。
+ * ReportActions: download action bar shown after analysis is done.
  */
 import { useCallback } from "react";
 import { motion } from "framer-motion";
 import styles from "./ReportActions.module.css";
 import { downloadReport } from "../lib/api";
 
-export interface ReportActionsProps {
+interface ReportActionsProps {
   taskId: string;
   charts: number;
   insights: number;

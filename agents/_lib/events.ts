@@ -1,9 +1,9 @@
 /**
- * AgentEvent：前后端共用的事件协议。
+ * AgentEvent: Event protocol shared between frontend and backend.
  *
- * 后端通过 analyze() 的 onEvent 回调把这些事件吐出来；
- * HTTP 服务器把它们以 SSE 的形式推给浏览器；
- * 前端 useAgentStream 消费后驱动 UI。
+ * The backend emits these events via the analyze() onEvent callback;
+ * the HTTP server pushes them to the browser as SSE;
+ * the frontend useAgentStream hook consumes them to drive the UI.
  */
 import type { ChartMeta, Insight } from "./types.js";
 
@@ -13,7 +13,7 @@ export type AgentState = "running" | "done" | "skipped";
 
 export type ToolState = "running" | "done" | "failed";
 
-/** session：任务启动时发送一次；包含静态元信息 */
+/** session: sent once when the task starts; contains static metadata */
 export interface SessionEvent {
   type: "session";
   taskId: string;
@@ -90,5 +90,5 @@ export type AgentEvent =
   | DoneEvent
   | ErrorEvent;
 
-/** 用于 in-process 回调的签名 */
+/** Signature for in-process event callbacks */
 export type EventEmitter = (event: AgentEvent) => void;
